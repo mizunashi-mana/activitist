@@ -1,6 +1,6 @@
 use std::{error::Error, io};
 
-use serde::ser::Serialize;
+use serde::{ser::Serialize, de::DeserializeOwned};
 use serde_json::{Serializer, ser::Formatter, Value, de::{Read, StrRead}, Deserializer, de::{IoRead, SliceRead}};
 
 use crate::model;
@@ -67,6 +67,31 @@ pub trait JsonSerde where Self: Sized {
         Ok(unsafe {
             String::from_utf8_unchecked(bytes)
         })
+    }
+}
+
+pub struct SerdeJsonValue<T> {
+    pub value: T,
+}
+impl<T: Serialize + DeserializeOwned> JsonSerde for SerdeJsonValue<T> {
+    fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
+        let value: T = serde::de::Deserialize::deserialize(&mut deserializer)?;
+        deserializer.end()?;
+        Ok(SerdeJsonValue { value })
+    }
+
+    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>> {
+        self.value.serialize(serializer)?;
+        Ok(())
+    }
+
+    fn from_value(value: &Value) -> Result<Self, Box<dyn Error>> {
+        let value: T = serde::de::Deserialize::deserialize(value)?;
+        Ok(SerdeJsonValue { value })
+    }
+
+    fn to_value(&self) -> Result<Value, Box<dyn Error>> {
+        Ok(serde_json::to_value(&self.value)?)
     }
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "activitist"
-version = "0.1.0"
+version = "0.2.0"
 description = "Models of ActivityPub"
 repository = "https://github.com/mizunashi-mana/activitist"
 license = "Apache-2.0 OR MPL-2.0"
