@@ -73,6 +73,15 @@ pub trait JsonSerde where Self: Sized {
 pub struct SerdeJsonValue<T> {
     pub value: T,
 }
+
+impl<T: Serialize + DeserializeOwned> SerdeJsonValue<T> {
+    pub fn new(value: T) -> Self {
+        Self {
+            value,
+        }
+    }
+}
+
 impl<T: Serialize + DeserializeOwned> JsonSerde for SerdeJsonValue<T> {
     fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
         let value: T = serde::de::Deserialize::deserialize(&mut deserializer)?;
