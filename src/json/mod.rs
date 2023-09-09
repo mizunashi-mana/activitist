@@ -1,7 +1,12 @@
 use std::{error::Error, io};
 
-use serde::{ser::Serialize, de::DeserializeOwned};
-use serde_json::{Serializer, ser::Formatter, Value, de::{Read, StrRead}, Deserializer, de::{IoRead, SliceRead}};
+use serde::{de::DeserializeOwned, ser::Serialize};
+use serde_json::{
+    de::{IoRead, SliceRead},
+    de::{Read, StrRead},
+    ser::Formatter,
+    Deserializer, Serializer, Value,
+};
 
 use crate::model;
 
@@ -9,9 +14,15 @@ use self::model_conv::ModelConv;
 
 mod model_conv;
 
-pub trait JsonSerde where Self: Sized {
+pub trait JsonSerde
+where
+    Self: Sized,
+{
     fn read_json<'de, R: Read<'de>>(deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>>;
-    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>>;
+    fn write_json<W: io::Write, F: Formatter>(
+        &self,
+        serializer: &mut Serializer<W, F>,
+    ) -> Result<(), Box<dyn Error>>;
 
     fn from_value(value: &Value) -> Result<Self, Box<dyn Error>>;
     fn to_value(&self) -> Result<Value, Box<dyn Error>>;
@@ -57,16 +68,12 @@ pub trait JsonSerde where Self: Sized {
 
     fn to_json_string(&self) -> Result<String, Box<dyn Error>> {
         let bytes = self.to_json_bytes()?;
-        Ok(unsafe {
-            String::from_utf8_unchecked(bytes)
-        })
+        Ok(unsafe { String::from_utf8_unchecked(bytes) })
     }
 
     fn to_string_pretty(&self) -> Result<String, Box<dyn Error>> {
         let bytes = self.to_json_bytes_pretty()?;
-        Ok(unsafe {
-            String::from_utf8_unchecked(bytes)
-        })
+        Ok(unsafe { String::from_utf8_unchecked(bytes) })
     }
 }
 
@@ -76,20 +83,23 @@ pub struct SerdeJsonValue<T> {
 
 impl<T: Serialize + DeserializeOwned> SerdeJsonValue<T> {
     pub fn new(value: T) -> Self {
-        Self {
-            value,
-        }
+        Self { value }
     }
 }
 
 impl<T: Serialize + DeserializeOwned> JsonSerde for SerdeJsonValue<T> {
-    fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
+    fn read_json<'de, R: Read<'de>>(
+        mut deserializer: Deserializer<R>,
+    ) -> Result<Self, Box<dyn Error>> {
         let value: T = serde::de::Deserialize::deserialize(&mut deserializer)?;
         deserializer.end()?;
         Ok(SerdeJsonValue { value })
     }
 
-    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>> {
+    fn write_json<W: io::Write, F: Formatter>(
+        &self,
+        serializer: &mut Serializer<W, F>,
+    ) -> Result<(), Box<dyn Error>> {
         self.value.serialize(serializer)?;
         Ok(())
     }
@@ -105,20 +115,27 @@ impl<T: Serialize + DeserializeOwned> JsonSerde for SerdeJsonValue<T> {
 }
 
 impl JsonSerde for model::Context {
-    fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(&mut deserializer)?;
+    fn read_json<'de, R: Read<'de>>(
+        mut deserializer: Deserializer<R>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(&mut deserializer)?;
         deserializer.end()?;
         Ok(ModelConv::to_model(value)?)
     }
 
-    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>> {
+    fn write_json<W: io::Write, F: Formatter>(
+        &self,
+        serializer: &mut Serializer<W, F>,
+    ) -> Result<(), Box<dyn Error>> {
         let value = self.from_model()?;
         value.serialize(serializer)?;
         Ok(())
     }
 
     fn from_value(value: &Value) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(value)?;
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(value)?;
         Ok(ModelConv::to_model(value)?)
     }
 
@@ -128,20 +145,27 @@ impl JsonSerde for model::Context {
 }
 
 impl JsonSerde for model::Object {
-    fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(&mut deserializer)?;
+    fn read_json<'de, R: Read<'de>>(
+        mut deserializer: Deserializer<R>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(&mut deserializer)?;
         deserializer.end()?;
         Ok(ModelConv::to_model(value)?)
     }
 
-    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>> {
+    fn write_json<W: io::Write, F: Formatter>(
+        &self,
+        serializer: &mut Serializer<W, F>,
+    ) -> Result<(), Box<dyn Error>> {
         let value = self.from_model()?;
         value.serialize(serializer)?;
         Ok(())
     }
 
     fn from_value(value: &Value) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(value)?;
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(value)?;
         Ok(ModelConv::to_model(value)?)
     }
 
@@ -151,20 +175,27 @@ impl JsonSerde for model::Object {
 }
 
 impl JsonSerde for model::Link {
-    fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(&mut deserializer)?;
+    fn read_json<'de, R: Read<'de>>(
+        mut deserializer: Deserializer<R>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(&mut deserializer)?;
         deserializer.end()?;
         Ok(ModelConv::to_model(value)?)
     }
 
-    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>> {
+    fn write_json<W: io::Write, F: Formatter>(
+        &self,
+        serializer: &mut Serializer<W, F>,
+    ) -> Result<(), Box<dyn Error>> {
         let value = self.from_model()?;
         value.serialize(serializer)?;
         Ok(())
     }
 
     fn from_value(value: &Value) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(value)?;
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(value)?;
         Ok(ModelConv::to_model(value)?)
     }
 
@@ -174,20 +205,27 @@ impl JsonSerde for model::Link {
 }
 
 impl JsonSerde for model::ObjectOrLink {
-    fn read_json<'de, R: Read<'de>>(mut deserializer: Deserializer<R>) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(&mut deserializer)?;
+    fn read_json<'de, R: Read<'de>>(
+        mut deserializer: Deserializer<R>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(&mut deserializer)?;
         deserializer.end()?;
         Ok(ModelConv::to_model(value)?)
     }
 
-    fn write_json<W: io::Write, F: Formatter>(&self, serializer: &mut Serializer<W, F>) -> Result<(), Box<dyn Error>> {
+    fn write_json<W: io::Write, F: Formatter>(
+        &self,
+        serializer: &mut Serializer<W, F>,
+    ) -> Result<(), Box<dyn Error>> {
         let value = self.from_model()?;
         value.serialize(serializer)?;
         Ok(())
     }
 
     fn from_value(value: &Value) -> Result<Self, Box<dyn Error>> {
-        let value: <Self as ModelConv>::JsonSerdeValue = serde::de::Deserialize::deserialize(value)?;
+        let value: <Self as ModelConv>::JsonSerdeValue =
+            serde::de::Deserialize::deserialize(value)?;
         Ok(ModelConv::to_model(value)?)
     }
 

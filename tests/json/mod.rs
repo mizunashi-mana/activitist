@@ -10,8 +10,7 @@ fn deserialize_context() {
         "https://www.w3.org/ns/activitystreams"
     ]"#;
 
-    let data: ap_model::Context =
-        ap_model::Context::from_json_str(serialized_data).unwrap();
+    let data: ap_model::Context = ap_model::Context::from_json_str(serialized_data).unwrap();
 
     assert_eq!(
         data,
@@ -246,8 +245,7 @@ fn deserialize_object() {
             "sharedInbox": "https://example.com/inbox"
         }
     }"#;
-    let data: ap_model::Object =
-        ap_model::Object::from_json_str(serialized_data).unwrap();
+    let data: ap_model::Object = ap_model::Object::from_json_str(serialized_data).unwrap();
 
     assert_eq!(
         data,
@@ -362,8 +360,7 @@ fn deserialize_collection() {
         "items": []
     }"#;
 
-    let data: ap_model::Object =
-        ap_model::Object::from_json_str(serialized_data).unwrap();
+    let data: ap_model::Object = ap_model::Object::from_json_str(serialized_data).unwrap();
 
     assert_eq!(
         data,
