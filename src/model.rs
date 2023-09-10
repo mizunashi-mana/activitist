@@ -479,6 +479,7 @@ pub struct ActivityStreamExtItems {
     pub manually_approves_followers: Option<bool>,
     pub also_known_as: Vec<String>,
     pub moved_to: Option<String>,
+    pub sensitive: Option<bool>,
 }
 
 impl ActivityStreamExtItems {
@@ -487,6 +488,7 @@ impl ActivityStreamExtItems {
             manually_approves_followers: None,
             also_known_as: vec![],
             moved_to: None,
+            sensitive: None,
         }
     }
 }

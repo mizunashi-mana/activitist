@@ -140,6 +140,7 @@ impl ModelConv for model::Object {
                 .manually_approves_followers,
             also_known_as: to_lax_array(&self.activity_streams_ext_items.also_known_as)?,
             moved_to: self.activity_streams_ext_items.moved_to.clone(),
+            sensitive: self.activity_streams_ext_items.sensitive,
             featured: self.mastodon_ext_items.featured.clone(),
             featured_tags: self.mastodon_ext_items.featured_tags.clone(),
             discoverable: self.mastodon_ext_items.discoverable,
@@ -274,6 +275,7 @@ impl ModelConv for model::Object {
                 manually_approves_followers: origin.manually_approves_followers,
                 also_known_as: from_lax_array(origin.also_known_as)?,
                 moved_to: origin.moved_to,
+                sensitive: origin.sensitive,
             },
             mastodon_ext_items: model::MastodonExtItems {
                 featured: origin.featured,
@@ -691,6 +693,7 @@ pub struct Object {
     also_known_as: Option<Value>,
     #[serde(rename = "movedTo")]
     moved_to: Option<String>,
+    sensitive: Option<bool>,
 
     // http://joinmastodon.org/ns#featured
     featured: Option<String>,

@@ -81,6 +81,7 @@ fn serialize_object() {
             manually_approves_followers: Some(false),
             also_known_as: vec!["https://example.com/users/sample_alias".to_string()],
             moved_to: Some("https://example.com/users/sample_alias".to_string()),
+            sensitive: None,
         },
         mastodon_ext_items: ap_model::MastodonExtItems {
             featured: Some("https://example.com/users/sample/collections/featured".to_string()),
@@ -328,6 +329,7 @@ fn deserialize_object() {
                 manually_approves_followers: Some(false),
                 also_known_as: vec!["https://example.com/users/sample_alias".to_string()],
                 moved_to: Some("https://example.com/users/sample_alias".to_string()),
+                sensitive: None,
             },
             mastodon_ext_items: ap_model::MastodonExtItems {
                 featured: Some("https://example.com/users/sample/collections/featured".to_string()),
